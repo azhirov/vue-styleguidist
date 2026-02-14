@@ -67,7 +67,10 @@ describe('setupSlotHandler', () => {
 	it('should parse the proper bindings', async () => {
 		const slotDescriptor = await parserTest(`
 			defineSlots<{
-				test(bindings: {
+				/**
+				 * test slot comment
+				 */
+				'test-slot'(bindings: {
 					/**
 					 * the id of the slot
 					 */
@@ -84,11 +87,17 @@ describe('setupSlotHandler', () => {
 			    "description": "the id of the slot",
 			    "name": "id",
 			    "title": "binding",
+			    "type": {
+			      "name": "number",
+			    },
 			  },
 			  {
 			    "description": "this is a label",
 			    "name": "label",
 			    "title": "binding",
+			    "type": {
+			      "name": "string",
+			    },
 			  },
 			]
 		`)
