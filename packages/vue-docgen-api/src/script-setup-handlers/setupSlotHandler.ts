@@ -6,6 +6,7 @@ import Documentation, { BlockTag, DocBlockTags, ParamTag, SlotDescriptor } from 
 import getDocblock from '../utils/getDocblock'
 import getDoclets from '../utils/getDoclets'
 import transformTagsIntoObject from '../utils/transformTagsIntoObject'
+import getTypeFromAnnotation from "../utils/getTypeFromAnnotation";
 
 /**
  * Extract information from an setup-style VueJs 3 component
@@ -55,7 +56,7 @@ export default defineHandler(async function setupSlotHandler(
 
 function getSlotsFromLiteralType(documentation: Documentation, members: any) {
 	members.each((propPath: NodePath) => {
-		const slotName = propPath.get('key').node.name
+		const slotName = propPath.get('key').node.name ?? propPath.get('key').node.value;
 		const slotDescriptor = documentation.getSlotDescriptor(slotName)
 		slotDescriptor.name = slotName
 		parseDocBlock(slotDescriptor, propPath)
@@ -65,6 +66,7 @@ function getSlotsFromLiteralType(documentation: Documentation, members: any) {
 				let bindingDescriptors: ParamTag[] = []
 				p.get('members').each((paramPath: NodePath) => {
 					const paramName = paramPath.get('key')?.value?.name
+					const type = getTypeFromAnnotation(paramPath.value.typeAnnotation);
 					const docBlock = getDocblock(paramPath)
 					const jsDoc: DocBlockTags = docBlock
 						? getDoclets(docBlock)
@@ -73,7 +75,8 @@ function getSlotsFromLiteralType(documentation: Documentation, members: any) {
 					bindingDescriptors.push({
 						name: paramName,
 						title: 'binding',
-						description: jsDoc.description
+						description: jsDoc.description,
+						type,
 					})
 				})
 
